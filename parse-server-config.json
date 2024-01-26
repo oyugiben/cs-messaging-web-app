@@ -1,0 +1,16 @@
+{
+  "apps": [
+    {
+      "serverURL": "http://localhost:1337/branch-cs-messaging-web-app",
+      "appId": "branch-cs-messaging-web-app",
+      "masterKey": "N9IcW9EFc^WUjFbe6(!!L#uqvg^k33AD9LL!4LnPT+VhkPPqNk",
+      "appName": "cs messaging app"
+    }
+  ],
+  "users": [
+    {
+      "user": "admin",
+      "pass": "pass"
+    }
+  ]
+}

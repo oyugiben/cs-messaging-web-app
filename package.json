@@ -1,0 +1,21 @@
+{
+  "name": "cs-messaging-app",
+  "version": "1.0.0",
+  "description": "A scalable customer messaging platform designed to handle a high volume of customer inquiries for effective customer service. The application facilitates a streamlined communication process by allowing a team of agents to log in simultaneously and respond to incoming messages from customers.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/oyugiben/cs-messaging-web-app"
+  },
+  "author": "oyugiben",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.4.1",
+    "parse-server": "^6.4.0",
+    "prettier": "^3.2.4"
+  }
+}
