@@ -21,25 +21,25 @@ let ipAddress;
 
 // Function to get the ip address of the host machine.
 function getLocalIpAddress(ipAddress) {
-    return new Promise((resolve, reject) => {
-      const ifaces = os.networkInterfaces();
-  
-      Object.keys(ifaces).forEach(ifname => {
-        ifaces[ifname].forEach(iface => {
-          if (iface.family === 'IPv4' && !iface.internal) {
-            ipAddress = iface.address;
-          }
-        });
+  return new Promise((resolve, reject) => {
+    const ifaces = os.networkInterfaces();
+
+    Object.keys(ifaces).forEach(ifname => {
+      ifaces[ifname].forEach(iface => {
+        if (iface.family === 'IPv4' && !iface.internal) {
+          ipAddress = iface.address;
+        }
       });
-  
-      if (ipAddress) {
-        console.log("🚀 ~ getLocalIpAddress ~ ipAddress:", ipAddress);
-        resolve(ipAddress);
-      } else {
-        reject(new Error('Could not resolve the host machines ip address'));
-      }
     });
-  }
+
+    if (ipAddress) {
+      console.log('🚀 ~ getLocalIpAddress ~ ipAddress:', ipAddress);
+      resolve(ipAddress);
+    } else {
+      reject(new Error('Could not resolve the host machines ip address'));
+    }
+  });
+}
 
 //Parse Server configuration options.
 export const config = {
@@ -51,85 +51,85 @@ export const config = {
   serverUrl: `http://localhost:${port}${mountPath}`,
   publicServerUrl: `http://${ipAddress}:${port}${mountPath}`,
   liveQuery: ['CustomerMessages'],
-  mountPath: mountPath
+  mountPath: mountPath,
 };
 
 //Function to start the parse-server instance.
 async function initializeParseServer() {
-    try {
-        //Get ip address.
-        ipAddress = await getLocalIpAddress();
-        config.publicServerUrl = `http://${ipAddress}:${port}${mountPath}`
+  try {
+    //Get ip address.
+    ipAddress = await getLocalIpAddress();
+    config.publicServerUrl = `http://${ipAddress}:${port}${mountPath}`;
 
-        //Start parse server.
-        //Serve the parse api
-        const server = new ParseServer(config);
-        await server.start();
-        app.use(`${mountPath}`, server.app);
+    //Start parse server.
+    //Serve the parse api
+    const server = new ParseServer(config);
+    await server.start();
+    app.use(`${mountPath}`, server.app);
 
-        //Serve the frontend
-        // Serve the React app from the react-build folder
-        app.use(express.static(path.join(__dirname, 'react-build')));
+    //Serve the frontend
+    // Serve the React app from the react-build folder
+    app.use(express.static(path.join(__dirname, 'react-build')));
 
-        // Handle requests to the root URL
-        app.get('/', function (req, res) {
-            res.sendFile(path.join(__dirname, 'react-build', 'index.html'));
-        });
+    // Handle requests to the root URL
+    app.get('/', function (req, res) {
+      res.sendFile(path.join(__dirname, 'react-build', 'index.html'));
+    });
 
-        const httpServer = http.createServer(app);
-        httpServer.listen(port, function () {
-            console.log(`Server running on port ${port}`)
-        })
-        //Enable liveQueries for realtime data.
-        await ParseServer.createLiveQueryServer(httpServer);
-    } catch (error) {
-        console.log("🚀 ~ initializeParseServer ~ error:", error);
-        throw new Parse.Error(error);
-    }
+    const httpServer = http.createServer(app);
+    httpServer.listen(port, function () {
+      console.log(`Server running on port ${port}`);
+    });
+    //Enable liveQueries for realtime data.
+    await ParseServer.createLiveQueryServer(httpServer);
+  } catch (error) {
+    console.log('🚀 ~ initializeParseServer ~ error:', error);
+    throw new Error(error);
+  }
 }
 
 function initializeParseDashboard() {
-    return new Promise((resolve, reject) => {
-      const initializeParseDash = spawn('parse-dashboard', [
-        '--config',
-        'parse-server-config.json',
-        '--allowInsecureHTTP',
-        'true',
-      ]);
-  
-      let messageDetected = false;
-      initializeParseDash.stdout.on('data', data => {
-        console.log(`stdout: ${data}`);
-        if (!messageDetected && data.includes('parse-dashboard is now running')) {
-          messageDetected = true;
-          resolve(); // Resolve the promise when the message is detected for the first time.
-        }
-      });
-  
-      initializeParseDash.stderr.on('data', data => {
-        console.log(`stderr: ${data}`);
-        reject(data.toString());
-      });
-  
-      initializeParseDash.on('error', error => {
-        console.log(`error: ${error}`);
-        reject(error);
-      });
-  
-      initializeParseDash.on('exit', code => {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(new Error(`Parse Dashboard exited with code ${code}`));
-        }
-      });
+  return new Promise((resolve, reject) => {
+    const initializeParseDash = spawn('parse-dashboard', [
+      '--config',
+      'parse-server-config.json',
+      '--allowInsecureHTTP',
+      'true',
+    ]);
+
+    let messageDetected = false;
+    initializeParseDash.stdout.on('data', data => {
+      console.log(`stdout: ${data}`);
+      if (!messageDetected && data.includes('parse-dashboard is now running')) {
+        messageDetected = true;
+        resolve(); // Resolve the promise when the message is detected for the first time.
+      }
     });
-  }
+
+    initializeParseDash.stderr.on('data', data => {
+      console.log(`stderr: ${data}`);
+      reject(data.toString());
+    });
+
+    initializeParseDash.on('error', error => {
+      console.log(`error: ${error}`);
+      reject(error);
+    });
+
+    initializeParseDash.on('exit', code => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`Parse Dashboard exited with code ${code}`));
+      }
+    });
+  });
+}
 
 //Function to start the server
 async function startServer() {
-    await initializeParseServer();
-    await initializeParseDashboard();
+  await initializeParseServer();
+  await initializeParseDashboard();
 }
 
 //Start the server
