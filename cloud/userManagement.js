@@ -47,6 +47,38 @@ async function assignRoleToUser(user, roleName) {
   }
 }
 
+//Get Customer.
+export async function getCustomer(customerUserId) {
+  if (!customerUserId) {
+    throw new Error('Customer userId cannot be empty');
+  }
+
+  const customer = await new Parse.Query(Parse.User)
+    .equalTo('objectId', customerUserId)
+    .first({ useMasterKey: true });
+
+  if (!customer) {
+    throw new Error('Customer not found');
+  }
+  return customer;
+}
+
+//Get Agent.
+export async function getAgent(agentUserId) {
+  if (!agentUserId) {
+    throw new Error('Agent userId cannot be empty');
+  }
+
+  const agent = await new Parse.Query(Parse.User)
+    .equalTo('objectId', agentUserId)
+    .first({ useMasterKey: true });
+
+  if (!agent) {
+    throw new Error('Customer not found');
+  }
+  return agent;
+}
+
 //Sign up admin.
 export async function signUpAdmin(email, username, password) {
   if (!email || !username || !password) {
@@ -79,6 +111,7 @@ export async function signUpAgent(email, username, password) {
   agentUser.setEmail(email);
   agentUser.setUsername(username);
   agentUser.setPassword(password);
+  agentUser.set('customersAssigned', []);
 
   // Save agent user
   await agentUser.signUp(null, { useMasterKey: true });
@@ -100,6 +133,7 @@ export async function signUpCustomer(email, username, password) {
   customerUser.setEmail(email);
   customerUser.setUsername(username);
   customerUser.setPassword(password);
+  customerUser.set('agentAssigned', undefined);
 
   // Save customer user
   await customerUser.signUp(null, { useMasterKey: true });
