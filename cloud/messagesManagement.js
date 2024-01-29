@@ -1,6 +1,6 @@
 /* global Parse */
 /* eslint-disable no-undef */
-import * as userManagement from 'userManagement.js';
+import * as userManagement from './userManagement.js';
 
 const CustomerMessages = Parse.Object.extend('CustomerMessages');
 const AgentMessages = Parse.Object.extend('AgentMessages');
@@ -99,13 +99,13 @@ async function createCustomerMessage(customer, agent, messageBody) {
 }
 
 async function createAgentMessage(customer, agent, messageBody) {
-    const agentMessage = new AgentMessages();
-    agentMessage.set('customer', customer);
-    agentMessage.set('agent', agent);
-    agentMessage.set('messageBody', messageBody);
-    agentMessage.set('isRead', false);
-    await agentMessage.save(null, { useMasterKey: true });
-    return agentMessage;
+  const agentMessage = new AgentMessages();
+  agentMessage.set('customer', customer);
+  agentMessage.set('agent', agent);
+  agentMessage.set('messageBody', messageBody);
+  agentMessage.set('isRead', false);
+  await agentMessage.save(null, { useMasterKey: true });
+  return agentMessage;
 }
 
 export async function sendCustomerMessage(customerUserId, messageBody) {
@@ -129,10 +129,11 @@ export async function sendCustomerMessage(customerUserId, messageBody) {
   return;
 }
 
-export async function sendAgentMessage(chatRoom, agentUserId, messageBody) {
-     const agent = await userManagement.getAgent(agentUserId);
-     const customer = chatroom.get('customer');
-     const agentMessage = await createAgentMessage(customer, agent, messageBody);
-     await updateChatroom(chatRoom, agentMessage);
-     return;
+export async function sendAgentMessage(chatRoomId, agentUserId, messageBody) {
+  const chatRoom = await getChatRoom(chatRoomId);
+  const agent = await userManagement.getAgent(agentUserId);
+  const customer = chatRoom.get('customer');
+  const agentMessage = await createAgentMessage(customer, agent, messageBody);
+  await updateChatroom(chatRoom, agentMessage);
+  return;
 }

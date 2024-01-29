@@ -1,6 +1,7 @@
 /* global Parse */
 /* eslint-disable no-undef */
 import * as userManagement from './userManagement.js';
+import * as messagesManagement from './messagesManagement.js';
 
 //Cloud functions
 
@@ -26,4 +27,16 @@ Parse.Cloud.define('signUpAgent', async req => {
 Parse.Cloud.define('signUpCustomer', async req => {
   const { email, password, username } = req.params;
   await userManagement.signUpCustomer(email, password, username);
+});
+
+//Send message to branch
+Parse.Cloud.define('sendMessageToBranch', async req => {
+  const { customerUserId, messageBody } = req.params;
+  await messagesManagement.sendCustomerMessage(customerUserId, messageBody);
+});
+
+//Send message to customer
+Parse.Cloud.define('sendMessageToCustomer', async req => {
+  const { chatRoomId, agentUserId, messageBody } = req.params;
+  await messagesManagement.sendCustomerMessage(chatRoomId, agentUserId, messageBody);
 });

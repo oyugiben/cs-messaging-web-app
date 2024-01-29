@@ -2,35 +2,73 @@
 /* eslint-disable no-undef */
 
 //Define role names.
-const ADMIN_ROLE = 'Admin';
+const ADMIN_ROLE = 'Administrator';
 const AGENT_ROLE = 'Agent';
 const CUSTOMER_ROLE = 'Customer';
 
-//Function to create roles if they don't exist.
-async function createRolesIfNotExist() {
-  const adminRoleACL = new Parse.ACL();
-  adminRoleACL.setPublicReadAccess(false);
-  adminRoleACL.setPublicWriteAccess(false);
+// Function to set up Admin and Agents roles.
+async function setUpAdminAndAgents() {
+  try {
+    // Check if roles already exist
+    const existingAdminRole = await new Parse.Query(Parse.Role)
+      .equalTo('name', ADMIN_ROLE)
+      .first({ useMasterKey: true });
+    console.log('🚀 ~ setUpAdminAndAgents ~ existingAdminRole:', existingAdminRole);
+    const existingAgentRole = await new Parse.Query(Parse.Role)
+      .equalTo('name', AGENT_ROLE)
+      .first({ useMasterKey: true });
+    console.log('🚀 ~ setUpAdminAndAgents ~ existingAgentRole:', existingAgentRole);
+    const existingCustomerRole = await new Parse.Query(Parse.Role)
+      .equalTo('name', CUSTOMER_ROLE)
+      .first({ useMasterKey: true });
+    console.log('🚀 ~ setUpAdminAndAgents ~ existingCustomerRole:', existingCustomerRole);
 
-  const agentRoleACL = new Parse.ACL();
-  agentRoleACL.setPublicReadAccess(false);
-  agentRoleACL.setPublicWriteAccess(false);
+    // Create Admin role if not exist
+    if (!existingAdminRole) {
+      console.log('No admin role');
+      const adminRoleACL = new Parse.ACL();
+      adminRoleACL.setPublicReadAccess(false);
+      adminRoleACL.setPublicWriteAccess(false);
 
-  const customerRoleACL = new Parse.ACL();
-  customerRoleACL.setPublicReadAccess(false);
-  customerRoleACL.setPublicWriteAccess(false);
+      //Create one admin
+      const adminRole = new Parse.Role(ADMIN_ROLE, adminRoleACL);
+      await adminRole.save(null, { useMasterKey: true });
+      await signUpAdmin('admin@example.com', 'admin', 'pass');
+    }
 
-  // Create Admin role
-  const adminRole = new Parse.Role(ADMIN_ROLE, adminRoleACL);
-  await adminRole.save(null, { useMasterKey: true });
+    // Create Agent role if not exist
+    if (!existingAgentRole) {
+      const agentRoleACL = new Parse.ACL();
+      agentRoleACL.setPublicReadAccess(false);
+      agentRoleACL.setPublicWriteAccess(false);
 
-  // Create Agent role
-  const agentRole = new Parse.Role(AGENT_ROLE, agentRoleACL);
-  await agentRole.save(null, { useMasterKey: true });
+      const agentRole = new Parse.Role(AGENT_ROLE, agentRoleACL);
+      await agentRole.save(null, { useMasterKey: true });
 
-  // Create Customer role
-  const customerRole = new Parse.Role(CUSTOMER_ROLE, customerRoleACL);
-  await customerRole.save(null, { useMasterKey: true });
+      //Create 5 new Admins
+      for (let i = 0; i < 5; i++) {
+        await signUpAgent(`agent${i + 1}@example.com`, `agent${i + 1}`, 'pass');
+      }
+    }
+
+    // Create Customer role if not exist
+    if (!existingCustomerRole) {
+      const customerRoleACL = new Parse.ACL();
+      customerRoleACL.setPublicReadAccess(false);
+      customerRoleACL.setPublicWriteAccess(false);
+
+      const customerRole = new Parse.Role(CUSTOMER_ROLE, customerRoleACL);
+      await customerRole.save(null, { useMasterKey: true });
+
+      //create 56 customers
+      for (let i = 0; i < 56; i++) {
+        await signUpCustomer(`customer${i + 1}@example.com`, `customer${i + 1}`, 'pass');
+      }
+    }
+  } catch (error) {
+    console.error('Error setting up Admin and Agents:', error);
+    throw error;
+  }
 }
 
 // Function to assign a user to a specific role.
@@ -144,4 +182,4 @@ export async function signUpCustomer(email, username, password) {
   return;
 }
 
-createRolesIfNotExist();
+setUpAdminAndAgents();
