@@ -34,7 +34,7 @@ When running for the first time, Install dependencies first.
 $ npm install $$ npm start
 ```
 
-Otherwise just run
+The frontend build files have already been compiled therefore, otherwise just run. The agent portal is exposed at `http:localhost:1337`.
 
 ```bash
 $ npm start

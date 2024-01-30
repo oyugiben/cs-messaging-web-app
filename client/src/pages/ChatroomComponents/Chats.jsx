@@ -21,25 +21,33 @@ const Chats = () => {
     const handleSelect = (u) => {
         dispatch({ type: "CHANGE_CUSTOMER", payload: u });
       };
+
+      const chatArrays = Object.entries(chats);
+      console.log("🚀 ~ Chats ~ chatArrays:", chatArrays)
     
     
       return (
         <div className="chats">
-          {chats && Object.entries(chats)?.sort((a,b)=>b[1].get('createdAt') - a[1].get('createdAt')).map((chat) => (
+          {Object.entries(chats).map(([chatId, chat]) => (
             <div
-              className="userChat"
-              key={chat[0]}
-              onClick={() => handleSelect(chat[1].get('customer'))}
+              className="chatRoom"
+              key={chatId}
+              onClick={() => handleSelect(chat)}
             >
-              <img src={chat[1].get('customer').photoURL} alt="" />
-              <div className="userChatInfo">
-                <span>{chat[1].get('customer').displayName}</span>
-                <p>{chat[1].get('messages').pop?.text}</p>
+              <div className="chatRoomInfo">
+                {/* Replace with your actual Parse Server API function to fetch the most recent message */}
+                <span>
+                  {chat.get('messages').length > 0
+                    ? new Date(chat.get('messages')[0]._created_at.get('$date')).toLocaleString()
+                    : new Date(chat._created_at.get('$date')).toLocaleString()}
+                </span>
+                {/* Display other chat information as needed */}
               </div>
             </div>
           ))}
         </div>
       );
+    
 }
 
 export default Chats;
