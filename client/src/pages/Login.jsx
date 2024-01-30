@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import Parse from 'parse';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Parse from '../ParseInitialize';
 import logo from'./Branch-logo.jpg';
+import { AuthContext } from '../context/AuthContext';
 
  const Login = () => {
+    const { currentAgent } = useContext(AuthContext);
+    console.log("🚀 ~ Login ~ currentAgent:", currentAgent)
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
