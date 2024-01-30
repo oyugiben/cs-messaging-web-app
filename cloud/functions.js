@@ -38,5 +38,12 @@ Parse.Cloud.define('sendMessageToBranch', async req => {
 //Send message to customer
 Parse.Cloud.define('sendMessageToCustomer', async req => {
   const { chatRoomId, agentUserId, messageBody } = req.params;
-  await messagesManagement.sendCustomerMessage(chatRoomId, agentUserId, messageBody);
+  await messagesManagement.sendAgentMessage(chatRoomId, agentUserId, messageBody);
+});
+
+//Get chatRoom
+Parse.Cloud.define('getChatRoom', async req => {
+  const customer = req.params;
+  const chatRoom = await messagesManagement.getChatRoom(customer);
+  return chatRoom;
 });

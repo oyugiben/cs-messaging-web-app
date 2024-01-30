@@ -150,6 +150,7 @@ export async function signUpAgent(email, username, password) {
   agentUser.setUsername(username);
   agentUser.setPassword(password);
   agentUser.set('customersAssigned', []);
+  agentUser.set('chatrooms', []);
 
   // Save agent user
   await agentUser.signUp(null, { useMasterKey: true });

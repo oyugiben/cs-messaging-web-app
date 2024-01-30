@@ -9,27 +9,31 @@ const ChatRooms = Parse.Object.extend('ChatRooms');
 //Function to assign customer to agent.
 async function assignAgentToCustomer(customer) {
   try {
-    // Query for agents and sort by assignedCustomers length.
-    const agentQuery = new Parse.Query(Parse.User);
-    agentQuery.equalTo('role', 'Agent');
-    agentQuery.include('assignedCustomers');
-    agentQuery.ascending('assignedCustomers.length');
+    // Query for the "Agent" role.
+    const agentRoleQuery = new Parse.Query(Parse.Role);
+    agentRoleQuery.equalTo('name', 'Agent');
+    const agentRole = await agentRoleQuery.first({ useMasterKey: true });
+
+    if (!agentRole) {
+      throw new Error('Agent role not found');
+    }
+
+    // Query for users with the "Agent" role.
+    const agentQuery = agentRole.relation('users').query();
+    agentQuery.include('customersAssigned');
+    agentQuery.descending('customersAssigned.length');
 
     // Find the agent(s) with the least number of assigned customers.
     const agents = await agentQuery.find({ useMasterKey: true });
     if (!agents || agents.length === 0) {
       throw new Error('No agents were found');
     }
-    const agentsWithLeastCustomers = agents.filter(
-      agent => agent.get('assignedCustomers').length === agents[0].get('assignedCustomers').length
-    );
 
     // Randomly pick one of the agents with the least customers.
-    const chosenAgent =
-      agentsWithLeastCustomers[Math.floor(Math.random() * agentsWithLeastCustomers.length)];
+    const chosenAgent = agents[Math.floor(Math.random() * agents.length)];
 
     // Add the customer pointer to the chosen agent's assignedCustomers array.
-    chosenAgent.get('assignedCustomers').add(customer);
+    chosenAgent.addUnique('customersAssigned', customer);
     await chosenAgent.save(null, { useMasterKey: true });
 
     // Update the customer's agentAssigned field.
@@ -52,17 +56,20 @@ async function createChatRoom(customer, agent, customerMessage) {
   chatRoom.set('customer', customer);
   chatRoom.set('agent', agent);
   chatRoom.set('messages', [customerMessage]);
-  chatRoom.save(null, { useMasterKey: true });
+  await chatRoom.save(null, { useMasterKey: true });
+
+  agent.addUnique('chatrooms', chatRoom);
+  await agent.save(null, { useMasterKey: true });
 
   return;
 }
 
 //Get chat room.
-async function getChatRoom(customer) {
-  if (!customer) throw new Error('Get chatroom error, no customer provided');
+async function getChatRoom(chatRoomId) {
+  if (!chatRoomId) throw new Error('Get chatroom error, no customer provided');
 
   const chatRoom = await new Parse.Query('ChatRooms')
-    .equalTo('customer', customer)
+    .equalTo('objectId', chatRoomId)
     .first({ useMasterKey: true });
 
   if (!chatRoom) throw new Error('Get chatroom error, no chat room found');
@@ -131,6 +138,7 @@ export async function sendCustomerMessage(customerUserId, messageBody) {
 
 export async function sendAgentMessage(chatRoomId, agentUserId, messageBody) {
   const chatRoom = await getChatRoom(chatRoomId);
+  console.log('🚀 ~ sendAgentMessage ~ chatRoom:', chatRoom);
   const agent = await userManagement.getAgent(agentUserId);
   const customer = chatRoom.get('customer');
   const agentMessage = await createAgentMessage(customer, agent, messageBody);
