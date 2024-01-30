@@ -4,6 +4,7 @@ import { ChatContext } from "../../context/ChatContext";
 
 const Chats = () => {
     const [chats, setChats] = useState([]);
+    console.log("🚀 ~ Chats ~ chats:", chats[0])
     const { currentAgent } = useContext(AuthContext);
     const { dispatch } = useContext(ChatContext);
 
