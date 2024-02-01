@@ -1,43 +1,45 @@
 /* global Parse */
 /* eslint-disable no-undef */
-import { createContext, useReducer, useContext } from "react";
-import { AuthContext } from "./AuthContext";
+import { createContext, useReducer, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 
 export const ChatContext = createContext();
 
 export const ChatContextProvider = ({ children }) => {
-    const { currentAgent } = useContext(AuthContext);
-    const INITIAL_STATE = {
-        chatRoomId: 'null',
-        customer: null,
-    };
+  const { currentAgent } = useContext(AuthContext);
+  currentAgent && console.log("🚀 ~ ChatContextProvider ~ currentAgent:", currentAgent)
 
-    const chatReducer = (state, action) => {
-        switch (action.type) {
-            case "CHANGE_USER":
-                const { payload } = action;
-                const chatRooms = currentAgent.get('chatRooms');
+  const INITIAL_STATE = {
+    chatRoomId: null,
+    customer: null,
+  };
 
-                // Find the chatRoom where the customer field matches the payload
-                const matchingChatRoom = chatRooms.find((chatRoom) =>
-                    chatRoom.get('customer').id === payload.id
-                );
+  let chatReducer = (state, action) => {};
+  currentAgent &&
+    (chatReducer = (state, action) => {
+      switch (action.type) {
+        case 'CHANGE_USER':
+          const { payload } = action;
+          const chatRooms = currentAgent.get('chatrooms');
+          console.log('🚀 ~ chatReducer ~ chatRooms:', chatRooms);
 
-                return {
-                    customer: payload,
-                    chatRoomId: matchingChatRoom ? matchingChatRoom.id : 'null'
-                };
+          // Find the chatRoom where the customer field matches the payload
+          const matchingChatRoom = chatRooms.find(
+            chatRoom => chatRoom.get('customer').id === payload.id
+          );
+          console.log("🚀 ~ ChatContextProvider ~ matchingChatRoom:", matchingChatRoom)
 
-            default:
-                return state;
-        }
-    };
+          return {
+            customer: payload,
+            chatRoomId: matchingChatRoom ? matchingChatRoom.id : 'null',
+          };
 
-    const [state, dispatch] = useReducer(chatReducer, INITIAL_STATE);
+        default:
+          return state;
+      }
+    });
 
-    return (
-        <ChatContext.Provider value={{ data: state, dispatch }}>
-            {children}
-        </ChatContext.Provider>
-    );
+  const [state, dispatch] = useReducer(chatReducer, INITIAL_STATE);
+
+  return <ChatContext.Provider value={{ data: state, dispatch }}>{children}</ChatContext.Provider>;
 };

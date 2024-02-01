@@ -34,7 +34,7 @@ When running for the first time, Install dependencies first.
 $ npm install $$ npm start
 ```
 
-The frontend build files have already been compiled therefore, otherwise just run. The agent portal is exposed at `http:localhost:1337`.
+The frontend build files have already been compiled therefore, otherwise just run. The agent portal is exposed at `http:localhost:1337`. The dashboard can be accessed at `http:localhost:4040`. The serverUrl is `http://localhost:1337/branch-cs-messaging-web-app`
 
 ```bash
 $ npm start

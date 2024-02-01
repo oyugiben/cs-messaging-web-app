@@ -65,16 +65,59 @@ async function createChatRoom(customer, agent, customerMessage) {
 }
 
 //Get chat room.
-async function getChatRoom(chatRoomId) {
+export async function getChatRoom(chatRoomId) {
   if (!chatRoomId) throw new Error('Get chatroom error, no customer provided');
 
   const chatRoom = await new Parse.Query('ChatRooms')
     .equalTo('objectId', chatRoomId)
+    .includeAll()
     .first({ useMasterKey: true });
 
   if (!chatRoom) throw new Error('Get chatroom error, no chat room found');
 
   return chatRoom;
+}
+
+//Fetch messages in one chatroom.
+export async function getChatRoomMessages(chatRoomId) {
+  if (!chatRoomId) throw new Error('Get chatroom error, no chatroom Id passed');
+
+  try {
+    // Create a new Parse Query for the ChatRooms class
+    const chatRoom = await new Parse.Query('ChatRooms')
+      .equalTo('objectId', chatRoomId)
+      .include('messages')
+      .first({ useMasterKey: true });
+
+    const messages = chatRoom.get('messages');
+
+    return messages;
+  } catch (error) {
+    console.error('Error fetching chat room messages:', error);
+    throw new Error('Error fetching chat room messages');
+  }
+}
+
+//get agent chatrooms
+export async function getChatRooms(agentId) {
+  if (!agentId) throw new Error('Cannot find chatrooms, no agent passed');
+
+  const agent = await userManagement.getAgent(agentId);
+  if (!agent) throw new Error('Could not find agent with provided agentId');
+
+  // Create a new Parse Query
+  const query = new Parse.Query(ChatRooms);
+
+  // Add a constraint to find chatrooms for the given agent
+  query.equalTo('agent', agent).includeAll();
+
+  // Execute the query to get the chatrooms
+  const chatrooms = await query.find({ useMasterKey: true });
+  console.log('🚀 ~ getChatRooms ~ chatrooms:', chatrooms);
+
+  if (!chatrooms) throw new Error('No chatrooms found for the given agent');
+
+  return chatrooms;
 }
 
 //Update chatroom. Add messages to chatro
@@ -129,7 +172,7 @@ export async function sendCustomerMessage(customerUserId, messageBody) {
   } else {
     agentAssigned = customer.get('agentAssigned');
     const customerMessage = await createCustomerMessage(customer, agentAssigned, messageBody);
-    const chatRoom = await getChatRoom(customer);
+    const chatRoom = customer.get('chatRoom');
     await updateChatroom(chatRoom, customerMessage);
   }
 

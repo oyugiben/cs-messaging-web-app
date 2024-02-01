@@ -11,11 +11,17 @@ const Search = () => {
 
     const handleSearch = async () => {
         try {
-            const customer = await Parse.Cloud.run('gerCustomerByUsername', { username });
+          const agentId = currentAgent.id;
+          const customerUsername = username
+            const customer = await Parse.Cloud.run('getCustomerByUsername', { customerUsername, agentId });
             if (!customer) {
                 throw new Error('No messages from custromer, '+ username)
-            } else setCustomer(customer)
+            } else {
+              setCustomer(customer);
+              setErr(false);
+            }
         } catch (error) {
+            console.log("🚀 ~ handleSearch ~ error:", error)
             setErr(true);
         }
     };
@@ -25,21 +31,9 @@ const Search = () => {
       };
 
     const handleSelect = async () => {
-        const chatRoomId = currentAgent.get('chatrooms').map((chatroom) => {
-            const customerId = chatroom.get('customer').chatRoomId
-            return customerId
-        });
-        console.log("🚀 ~ chatRoomId ~ chatRoomId:", chatRoomId)
-
-        try {
-            const chatRoom = await Parse.Cloud.run('getChatRoom', customer);
-            console.log("🚀 ~ handleSelect ~ chatRoom:", chatRoom)
-
-        } catch (err) {
-            setCustomer(null);
-            setUsername('');
-        }
-    }
+          setCustomer(null);
+          setUsername('');
+    };
     
     return (
         <div className="search">

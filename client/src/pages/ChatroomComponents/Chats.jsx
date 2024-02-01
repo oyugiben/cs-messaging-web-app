@@ -1,47 +1,46 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { ChatContext } from "../../context/ChatContext";
+import Parse from "../../ParseInitialize";
 
 const Chats = () => {
     const [chats, setChats] = useState([]);
-    console.log("🚀 ~ Chats ~ chats:", chats[0])
     const { currentAgent } = useContext(AuthContext);
+    console.log("🚀 ~ Chats ~ currentAgent:", currentAgent.id)
     const { dispatch } = useContext(ChatContext);
 
     useEffect(() => {
-        const getChats = () => {
-            const currentAgentChats = currentAgent.get('chatrooms');
-            setChats(currentAgentChats);
-        };
+      console.log("🚀 ~ useEffect ~ Effect is running");
+      getChats(currentAgent.id)
 
-        return () => {getChats()};
-        currentAgent.id && getChats();
-    }, [currentAgent.id]);
+        return () => {};
+    }, [currentAgent]);
+
+    const getChats = async (agentId) => {
+      const chats = await Parse.Cloud.run('getChatRooms', { agentId })
+      console.log("🚀 ~ getChats ~ chats:", chats[2].get('customer'));
+      setChats(chats)
+    }
 
     const handleSelect = (u) => {
         dispatch({ type: "CHANGE_CUSTOMER", payload: u });
       };
-
-      const chatArrays = Object.entries(chats);
-      console.log("🚀 ~ Chats ~ chatArrays:", chatArrays)
-    
     
       return (
         <div className="chats">
-          {Object.entries(chats).map(([chatId, chat]) => (
+          {chats.length > 0 && Object.entries(chats)?.sort((a, b) => b[1].get('updatedAt') - a[1].get('updatedAt')).map((chat) => (
             <div
-              className="chatRoom"
-              key={chatId}
-              onClick={() => handleSelect(chat)}
+              className="userChat"
+              key={chat[0]}
+              onClick={() => handleSelect(chat[1].get('customer'))}
             >
-              <div className="chatRoomInfo">
-                {/* Replace with your actual Parse Server API function to fetch the most recent message */}
-                <span>
-                  {chat.get('messages').length > 0
-                    ? new Date(chat.get('messages')[0]._created_at.get('$date')).toLocaleString()
-                    : new Date(chat._created_at.get('$date')).toLocaleString()}
-                </span>
-                {/* Display other chat information as needed */}
+              <img src='' alt="" />
+              <div className="userChatInfo">
+                <span>{chat[1].get('customer').get('username')}</span>
+                {/* Display the last message with a maximum of 20 characters */}
+                <p>{chat[1].get('messages').length > 0
+                  ? `${chat[1].get('messages')[0].get('messageBody').substring(0, 20)}${chat[1].get('messages')[0].get('messageBody').length > 20 ? '...' : ''}`
+                  : ''}</p>
               </div>
             </div>
           ))}

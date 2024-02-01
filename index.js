@@ -59,7 +59,7 @@ async function initializeParseServer() {
   try {
     //Get ip address.
     ipAddress = await getLocalIpAddress();
-    config.publicServerUrl = `http://${ipAddress}:${port}${mountPath}`;
+    config.publicServerURL = `http://${ipAddress}:${port}${mountPath}`;
 
     //Start parse server.
     //Serve the parse api

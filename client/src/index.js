@@ -6,8 +6,6 @@ import reportWebVitals from './reportWebVitals';
 import { AuthContextProvider } from './context/AuthContext';
 import { ChatContextProvider } from './context/ChatContext';
 
-console.log('🚀 ~ ChatContextProvider:', ChatContextProvider);
-console.log('🚀 ~ AuthContextProvider:', AuthContextProvider);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

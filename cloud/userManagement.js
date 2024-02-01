@@ -93,11 +93,32 @@ export async function getCustomer(customerUserId) {
 
   const customer = await new Parse.Query(Parse.User)
     .equalTo('objectId', customerUserId)
+    .includeAll()
     .first({ useMasterKey: true });
 
   if (!customer) {
     throw new Error('Customer not found');
   }
+  return customer;
+}
+
+// Search for users in chatrooms
+export async function getCustomerByUsername(customerUsername, agentId) {
+  console.log('🚀 ~ getCustomerByUsername ~ agentId:', agentId);
+  console.log('🚀 ~ getCustomerByUsername ~ customerUsername:', customerUsername);
+  if (!customerUsername || !agentId) throw new Error('No username or agentId passed');
+
+  // Get the agent
+  const agent = await getAgent(agentId);
+  const customersAssigned = agent.get('customersAssigned');
+
+  // Find the customer with the given username among the assigned customers
+  const customer = customersAssigned.find(assignedCustomer => {
+    return assignedCustomer.get('username') === customerUsername;
+  });
+
+  if (!customer) throw new Error('No customer with this username');
+
   return customer;
 }
 
@@ -109,6 +130,7 @@ export async function getAgent(agentUserId) {
 
   const agent = await new Parse.Query(Parse.User)
     .equalTo('objectId', agentUserId)
+    .includeAll()
     .first({ useMasterKey: true });
 
   if (!agent) {

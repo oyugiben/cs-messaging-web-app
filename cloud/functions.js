@@ -47,3 +47,19 @@ Parse.Cloud.define('getChatRoom', async req => {
   const chatRoom = await messagesManagement.getChatRoom(customer);
   return chatRoom;
 });
+
+//Get chatRooms
+Parse.Cloud.define('getChatRooms', async req => {
+  const { agentId } = req.params;
+  const chatrooms = await messagesManagement.getChatRooms(agentId);
+  return chatrooms;
+});
+
+//Search for user in chatrooms
+Parse.Cloud.define('getCustomerByUsername', async req => {
+  const { customerUsername, agentId } = req.params;
+  console.log('🚀 ~ agentId:', agentId);
+  console.log('🚀 ~ customerUsername:', customerUsername);
+  const customer = await userManagement.getCustomerByUsername(customerUsername, agentId);
+  return customer;
+});
