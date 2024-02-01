@@ -11,7 +11,10 @@ const Input = () => {
     const { data } = useContext(ChatContext);
 
     const handleSend = async () => {
-        await Parse.Cloud.run('sendAgentMessage', {text});
+      const agentUserId = currentAgent.id;
+      const messageBody = text;
+      const chatRoomId = data.chatRoomId;
+        await Parse.Cloud.run('sendMessageToCustomer', { chatRoomId, agentUserId, messageBody });
     
         setText("");
       };

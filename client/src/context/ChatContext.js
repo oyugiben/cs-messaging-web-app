@@ -18,7 +18,7 @@ export const ChatContextProvider = ({ children }) => {
   currentAgent &&
     (chatReducer = (state, action) => {
       switch (action.type) {
-        case 'CHANGE_USER':
+        case 'CHANGE_CUSTOMER':
           const { payload } = action;
           const chatRooms = currentAgent.get('chatrooms');
           console.log('🚀 ~ chatReducer ~ chatRooms:', chatRooms);

@@ -23,7 +23,7 @@ const Messages = () => {
   return (
     <div className="messages">
       {messages.map((m) => (
-        <Message message={m.get('messageBody')} key={m.id} />
+        <Message message={m} key={m.id} />
       ))}
     </div>
   );

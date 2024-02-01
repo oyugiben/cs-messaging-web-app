@@ -14,7 +14,7 @@ const Chat = () => {
         <div className="chat">
           <div className="chatInfo">
           {data.customer && (
-          <span>{data.customer.get('username')}</span>
+          <span>{data && data.customer?.get('username')}</span>
         )}
             <div className="chatIcons">
               <img src={Cam} alt="" />

@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { ChatContext } from "../../context/ChatContext";
 import Parse from "../../ParseInitialize";
+import DefaultAgent from '../img/default_agent.png'
+import DefaultCustomer from '../img/default_customer.png'
 
 const Chats = () => {
     const [chats, setChats] = useState([]);
@@ -34,7 +36,7 @@ const Chats = () => {
               key={chat[0]}
               onClick={() => handleSelect(chat[1].get('customer'))}
             >
-              <img src='' alt="" />
+              <img src={DefaultCustomer} alt="" />
               <div className="userChatInfo">
                 <span>{chat[1].get('customer').get('username')}</span>
                 {/* Display the last message with a maximum of 20 characters */}
