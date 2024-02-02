@@ -7,7 +7,7 @@ import Parse from '../../ParseInitialize';
 
 const Input = () => {
     const [text, setText] = useState("");
-    const { currentAgent } = useContext(AuthContext);
+    const { currentAgent, updateCurrentAgent } = useContext(AuthContext);
     const { data } = useContext(ChatContext);
 
     const handleSend = async () => {
@@ -17,7 +17,16 @@ const Input = () => {
         await Parse.Cloud.run('sendMessageToCustomer', { chatRoomId, agentUserId, messageBody });
     
         setText("");
+        updateCurrentAgent();
       };
+
+      const handleKeyPress = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault(); // Prevents a newline character from being inserted
+          handleSend();
+        }
+      };
+      
     
       return (
         <div className="input">
@@ -26,6 +35,7 @@ const Input = () => {
             placeholder="Type something..."
             onChange={(e) => setText(e.target.value)}
             value={text}
+            onKeyPress={handleKeyPress}
           />
           <div className="send">
             <img src={Attach} alt="" />

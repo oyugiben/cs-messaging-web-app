@@ -63,3 +63,9 @@ Parse.Cloud.define('getCustomerByUsername', async req => {
   const customer = await userManagement.getCustomerByUsername(customerUsername, agentId);
   return customer;
 });
+
+//Mark messages as read
+Parse.Cloud.define('readCustomerMessage', async req => {
+  const { customerMessageId } = req.params
+  await messagesManagement.readCustomerMessage(customerMessageId);
+});

@@ -5,7 +5,7 @@ import logo from'./Branch-logo.jpg';
 import { AuthContext } from '../context/AuthContext';
 
  const Login = () => {
-    const { currentAgent } = useContext(AuthContext);
+    const { currentAgent, updateCurrentAgent } = useContext(AuthContext);
     console.log("🚀 ~ Login ~ currentAgent:", currentAgent)
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -27,6 +27,7 @@ import { AuthContext } from '../context/AuthContext';
             }
             console.log("🚀 ~ handleLogin ~ user:", user)
             console.log("Log in succesfully")
+            await updateCurrentAgent();
             navigate('/chatroom');
         } catch (error) {
             alert(error.message);

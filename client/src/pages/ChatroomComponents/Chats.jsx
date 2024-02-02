@@ -13,15 +13,22 @@ const Chats = () => {
 
     useEffect(() => {
       console.log("🚀 ~ useEffect ~ Effect is running");
-      getChats(currentAgent.id)
+      getChats(currentAgent.id);
+      //Load the first conversation
+      if (chats.length > 0) {
+        handleSelect(chats[0].get('customer'));
+      }
 
         return () => {};
     }, [currentAgent]);
 
     const getChats = async (agentId) => {
-      const chats = await Parse.Cloud.run('getChatRooms', { agentId })
-      console.log("🚀 ~ getChats ~ chats:", chats[2].get('customer'));
+      try {
+        const chats = await Parse.Cloud.run('getChatRooms', { agentId })
       setChats(chats)
+      } catch (err) {
+        setChats([])
+       }
     }
 
     const handleSelect = (u) => {
@@ -30,22 +37,35 @@ const Chats = () => {
     
       return (
         <div className="chats">
-          {chats.length > 0 && Object.entries(chats)?.sort((a, b) => b[1].get('updatedAt') - a[1].get('updatedAt')).map((chat) => (
-            <div
-              className="userChat"
-              key={chat[0]}
-              onClick={() => handleSelect(chat[1].get('customer'))}
-            >
-              <img src={DefaultCustomer} alt="" />
-              <div className="userChatInfo">
-                <span>{chat[1].get('customer').get('username')}</span>
-                {/* Display the last message with a maximum of 20 characters */}
-                <p>{chat[1].get('messages').length > 0
-                  ? `${chat[1].get('messages')[0].get('messageBody').substring(0, 20)}${chat[1].get('messages')[0].get('messageBody').length > 20 ? '...' : ''}`
-                  : ''}</p>
-              </div>
-            </div>
-          ))}
+          {chats.length > 0 &&
+            Object.entries(chats)
+              .sort((a, b) => b[1].get('updatedAt') - a[1].get('updatedAt'))
+              .map((chat) => {
+                const message = chat[1].get('messages')[chat[1].get('messages').length - 1];
+    
+                return (
+                  <div
+                    className={`userChat ${message.className === 'CustomerMessages' && !message.get('isRead') ? 'unread' : ''}`}
+                    key={chat[0]}
+                    onClick={() => handleSelect(chat[1].get('customer'))}
+                  >
+                    <img src={DefaultCustomer} alt="" />
+                    <div className="userChatInfo">
+  <div className="infoContainer">
+    <span>{chat[1].get('customer').get('username')}</span>
+    <p>
+      {message
+        ? `${message.get('messageBody').substring(0, 20)}${
+            message.get('messageBody').length > 20 ? '...' : ''
+          }`
+        : ''}
+    </p>
+  </div>
+  {message && message.className === 'CustomerMessages' && !message.get('isRead') && <div className="greenDot"></div>}
+</div>
+                  </div>
+                );
+              })}
         </div>
       );
     

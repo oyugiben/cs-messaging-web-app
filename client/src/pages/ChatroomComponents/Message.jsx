@@ -4,10 +4,11 @@ import { ChatContext } from "../../context/ChatContext";
 import DefaultAgent from '../img/default_agent.png'
 import DefaultCustomer from '../img/default_customer.png'
 
-const Message = ({ message }) => {
-    console.log("🚀 ~ Message ~ message:", message)
+const Message = ({ message }) => {    
     const { currentAgent } = useContext(AuthContext);
     const { data } = useContext(ChatContext);
+
+    console.log("🚀 ~ Message ~ message:", message.className)
 
     const ref = useRef();
 
@@ -23,16 +24,18 @@ const Message = ({ message }) => {
           <div className="messageInfo">
             <img
               src={
-                message.get('agent').id === currentAgent.id
-                  ? currentAgent.get('photoURL')
-                  : data.customer.get('photoURL')
+                message.className === 'AgentMessages'
+                  ? DefaultAgent
+                  : DefaultCustomer
               }
               alt=""
             />
-            <span>{message.get('createdAt').toLocaleString()}</span>
           </div>
           <div className="messageContent">
-            <p>{message.get('messageBody')}</p>
+            <p>{message.get('messageBody')}
+            <hr />
+            <span className="date">{message.get('createdAt').toLocaleString()}</span>
+            </p>
             {message && <img src={message} alt='' />}
           </div>
         </div>

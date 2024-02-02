@@ -100,24 +100,29 @@ export async function getChatRoomMessages(chatRoomId) {
 
 //get agent chatrooms
 export async function getChatRooms(agentId) {
-  if (!agentId) throw new Error('Cannot find chatrooms, no agent passed');
+  try {
+    if (!agentId) throw new Error('Cannot find chatrooms, no agent passed');
 
-  const agent = await userManagement.getAgent(agentId);
-  if (!agent) throw new Error('Could not find agent with provided agentId');
+    const agent = await userManagement.getAgent(agentId);
+    console.log('🚀 ~ getChatRooms ~ agent:', agent);
+    if (!agent) throw new Error('Could not find agent with provided agentId');
 
-  // Create a new Parse Query
-  const query = new Parse.Query(ChatRooms);
+    // Create a new Parse Query
+    const query = new Parse.Query(ChatRooms);
+    console.log('🚀 ~ getChatRooms ~ query:', query);
 
-  // Add a constraint to find chatrooms for the given agent
-  query.equalTo('agent', agent).includeAll();
+    // Add a constraint to find chatrooms for the given agent
+    query.equalTo('agent', agent).includeAll();
 
-  // Execute the query to get the chatrooms
-  const chatrooms = await query.find({ useMasterKey: true });
-  console.log('🚀 ~ getChatRooms ~ chatrooms:', chatrooms);
+    // Execute the query to get the chatrooms
+    const chatrooms = await query.find({ useMasterKey: true });
+    console.log('🚀 ~ getChatRooms ~ chatrooms:', chatrooms);
 
-  if (!chatrooms) throw new Error('No chatrooms found for the given agent');
-
-  return chatrooms;
+    return chatrooms;
+  } catch (error) {
+    console.error('Error in getChatRooms:', error);
+    throw new Error('Failed to retrieve chatrooms.');
+  }
 }
 
 //Update chatroom. Add messages to chatro
@@ -146,6 +151,19 @@ async function createCustomerMessage(customer, agent, messageBody) {
   customerMessage.set('isRead', false);
   await customerMessage.save(null, { useMasterKey: true });
   return customerMessage;
+}
+
+//Mark messages as read
+export async function readCustomerMessage(customerMessageId) {
+  if (!customerMessageId) return new Error('Customer message id must be provided');
+  const message = await new Parse.Query('CustomerMessages')
+    .equalTo('objectId', customerMessageId)
+    .first({ useMasterKey: true });
+
+  if (!message) return new Error('No message found for the given Id');
+
+  message.set('isRead', true);
+  message.save(null, { useMasterKey: true });
 }
 
 async function createAgentMessage(customer, agent, messageBody) {

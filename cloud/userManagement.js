@@ -46,7 +46,7 @@ async function setUpAdminAndAgents() {
       await agentRole.save(null, { useMasterKey: true });
 
       //Create 5 new Admins
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 2; i++) {
         await signUpAgent(`agent${i + 1}@example.com`, `agent${i + 1}`, 'pass');
       }
     }
@@ -61,7 +61,7 @@ async function setUpAdminAndAgents() {
       await customerRole.save(null, { useMasterKey: true });
 
       //create 56 customers
-      for (let i = 0; i < 56; i++) {
+      for (let i = 0; i < 5; i++) {
         await signUpCustomer(`customer${i + 1}@example.com`, `customer${i + 1}`, 'pass');
       }
     }

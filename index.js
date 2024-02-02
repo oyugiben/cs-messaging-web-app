@@ -43,14 +43,14 @@ function getLocalIpAddress(ipAddress) {
 
 //Parse Server configuration options.
 export const config = {
-  databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/branch-cs-messaging-app-1',
+  databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/branch-cs-messaging-app-2',
   cloud: __dirname + (process.env.CLOUD_CODE_FILE_LOCATION || '/cloud/main.js'),
   appId: process.env.APP_ID || 'branch-cs-messaging-web-app', //Set the app id as you see fit
   masterKey: process.env.MASTER_KEY || 'masterKey', //Set the master key as you see fit
   appName: process.env.APP_NAME || 'cs-messaging-app',
   serverURL: `http://localhost:${port}${mountPath}`,
   publicServerURL: `http://${ipAddress}:${port}${mountPath}`,
-  liveQuery: ['ChatRooms'],
+  liveQuery: ['ChatRooms', '_User'],
   mountPath: mountPath,
 };
 
