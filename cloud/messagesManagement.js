@@ -78,6 +78,17 @@ export async function getChatRoom(chatRoomId) {
   return chatRoom;
 }
 
+//Get chatroom by customer
+async function getChatRoomByCustomer(customer) {
+  if (!customer) throw new Error('Get chatroom error, no customer passed');
+  const chatRoom = await new Parse.Query('ChatRooms')
+    .equalTo('customer', customer)
+    .first({ useMasterKey: true });
+
+  if (!chatRoom) throw new Error('No chatroom found for the given customer');
+  return chatRoom;
+}
+
 //Fetch messages in one chatroom.
 export async function getChatRoomMessages(chatRoomId) {
   if (!chatRoomId) throw new Error('Get chatroom error, no chatroom Id passed');
@@ -185,12 +196,17 @@ export async function sendCustomerMessage(customerUserId, messageBody) {
   //Check if assigned to an Agent.
   if (!customer.get('agentAssigned')) {
     agentAssigned = await assignAgentToCustomer(customer);
+    console.log('🚀 ~ sendCustomerMessage ~ agentAssigned:', agentAssigned);
     const customerMessage = await createCustomerMessage(customer, agentAssigned, messageBody);
+    console.log('🚀 ~ sendCustomerMessage ~ customerMessage:', customerMessage);
     await createChatRoom(customer, agentAssigned, customerMessage);
   } else {
     agentAssigned = customer.get('agentAssigned');
+    console.log('🚀 ~ sendCustomerMessage ~ agentAssigned:', agentAssigned);
     const customerMessage = await createCustomerMessage(customer, agentAssigned, messageBody);
-    const chatRoom = customer.get('chatRoom');
+    console.log('🚀 ~ sendCustomerMessage ~ customerMessage:', customerMessage);
+    const chatRoom = getChatRoomByCustomer(customer);
+    console.log('🚀 ~ sendCustomerMessage ~ chatRoom:', chatRoom);
     await updateChatroom(chatRoom, customerMessage);
   }
 

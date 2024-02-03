@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from '../../context/AuthContext';
 import Parse from '../../ParseInitialize';
+import DefaultCustomer from '../img/default_customer.png'
 
 const Search = () => {
     const [username, setUsername] = useState("");
@@ -49,7 +50,7 @@ const Search = () => {
       {err && <span>Customer not found!</span>}
       {customer && (
         <div className="userChat" onClick={handleSelect}>
-          <img src={customer.photoURL} alt="" />
+          <img src={DefaultCustomer} alt="" />
           <div className="userChatInfo">
             <span>{customer.get('username')}</span>
           </div>

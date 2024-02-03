@@ -195,6 +195,7 @@ export async function signUpCustomer(email, username, password) {
   customerUser.setUsername(username);
   customerUser.setPassword(password);
   customerUser.set('agentAssigned', undefined);
+  customerUser.set('chatRoom')
 
   // Save customer user
   await customerUser.signUp(null, { useMasterKey: true });
