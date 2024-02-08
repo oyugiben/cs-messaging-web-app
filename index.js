@@ -16,6 +16,7 @@ export const app = express();
 dotenv.config();
 const __dirname = path.resolve();
 const mountPath = process.env.MOUNT_PATH || '/branch-cs-messaging-web-app';
+console.log('🚀 ~ mountPath:', mountPath);
 const port = 1337;
 let ipAddress;
 

@@ -1,12 +1,15 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from '../../context/AuthContext';
 import Parse from '../../ParseInitialize';
-import DefaultCustomer from '../img/default_customer.png'
+import DefaultCustomer from '../img/default_customer.png';
+import { ChatContext } from "../../context/ChatContext";
+
 
 const Search = () => {
     const [username, setUsername] = useState("");
     const [customer, setCustomer] = useState(null);
     const [err, setErr] = useState(false);
+    const { dispatch } = useContext(ChatContext);
 
     const { currentAgent } = useContext(AuthContext);
 
@@ -31,9 +34,10 @@ const Search = () => {
         e.code === "Enter" && handleSearch();
       };
 
-    const handleSelect = async () => {
+    const handleSelect = (u) => {
           setCustomer(null);
           setUsername('');
+          dispatch({ type: "CHANGE_CUSTOMER", payload: u });
     };
     
     return (
@@ -49,7 +53,7 @@ const Search = () => {
       </div>
       {err && <span>Customer not found!</span>}
       {customer && (
-        <div className="userChat" onClick={handleSelect}>
+        <div className="userChat" onClick={handleSelect(customer)}>
           <img src={DefaultCustomer} alt="" />
           <div className="userChatInfo">
             <span>{customer.get('username')}</span>

@@ -205,7 +205,7 @@ export async function sendCustomerMessage(customerUserId, messageBody) {
     console.log('🚀 ~ sendCustomerMessage ~ agentAssigned:', agentAssigned);
     const customerMessage = await createCustomerMessage(customer, agentAssigned, messageBody);
     console.log('🚀 ~ sendCustomerMessage ~ customerMessage:', customerMessage);
-    const chatRoom = getChatRoomByCustomer(customer);
+    const chatRoom = await getChatRoomByCustomer(customer);
     console.log('🚀 ~ sendCustomerMessage ~ chatRoom:', chatRoom);
     await updateChatroom(chatRoom, customerMessage);
   }
@@ -217,7 +217,7 @@ export async function sendAgentMessage(chatRoomId, agentUserId, messageBody) {
   const chatRoom = await getChatRoom(chatRoomId);
   console.log('🚀 ~ sendAgentMessage ~ chatRoom:', chatRoom);
   const agent = await userManagement.getAgent(agentUserId);
-  const customer = chatRoom.get('customer');
+  const customer = await chatRoom.get('customer');
   const agentMessage = await createAgentMessage(customer, agent, messageBody);
   await updateChatroom(chatRoom, agentMessage);
   return;
